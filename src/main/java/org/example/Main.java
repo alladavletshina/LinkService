@@ -21,9 +21,10 @@ public class Main {
                 case 1:
                     System.out.println("Введите длинный URL для преобразования в короткую ссылку");
                     //String longId = scanner.nextLine();
-                    String longId = "https://www.baeldung.com/java-9-http-client";
+                    String longId = "https://www.baeldung.com/java-9-http-clients";
                     System.out.println(longId);
-                    String shortUrl = urlShortMaker.linkShortMaker(longId);
+                    //String shortUrl = urlShortMaker.linkShortMaker(longId);
+                    String shortUrl = urlShortMaker.generateUniqueUrl(longId);
                     System.out.println("Короткая ссылка: " + shortUrl);
                     break;
                 case 2:

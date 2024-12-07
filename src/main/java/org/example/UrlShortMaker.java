@@ -1,29 +1,23 @@
 package org.example;
 
-import java.util.Random;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class UrlShortMaker {
 
-    private Random random = new Random();
-    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final int BASE = ALPHABET.length();
 
-    public String linkShortMaker(String longUrl) {
-        long id = generateUniqueId(longUrl);
+    public String generateUniqueUrl(String longUrl) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] hashInBytes = md.digest(longUrl.getBytes());
+            String hash = Base64.getUrlEncoder().encodeToString(hashInBytes);
 
-        StringBuilder sb = new StringBuilder();
-        while (id > 0) {
-            sb.append(ALPHABET.charAt((int)(id % BASE)));
-            id /= BASE;
+            return hash.substring(0, 5);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
 
-        return sb.reverse().toString();
+        return "";
     }
-
-    private long generateUniqueId(String url) {
-        long id = random.nextLong();
-        // Здесь можно добавить проверку на уникальность id в базе данных
-        return id;
-    }
-
 }
