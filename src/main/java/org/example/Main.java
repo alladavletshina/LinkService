@@ -5,11 +5,11 @@ import java.util.Scanner;
 public class Main {
 
     private final Scanner scanner;
-    private final LinkLimitStartManager linkLimitStartManager;
+    private final UrlShortMaker urlShortMaker;
 
     public Main() {
         scanner = new Scanner(System.in);
-        linkLimitStartManager = new LinkLimitStartManager();
+        urlShortMaker = new UrlShortMaker();
     }
 
     public void startApplication() {
@@ -23,7 +23,7 @@ public class Main {
                     //String longId = scanner.nextLine();
                     String longId = "https://www.baeldung.com/java-9-http-client";
                     System.out.println(longId);
-                    String shortUrl = linkLimitStartManager.linkShortMaker(longId);
+                    String shortUrl = urlShortMaker.linkShortMaker(longId);
                     System.out.println("Короткая ссылка: " + shortUrl);
                     break;
                 case 2:
