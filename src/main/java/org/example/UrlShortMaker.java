@@ -61,19 +61,76 @@ public class UrlShortMaker {
         }
     }
 
+    public void deleteShortUrl(String uuid, String shortUrl) {
+        Map<String, ShortUrl> map = history.get(uuid);
+        if (map == null) {
+            System.out.println("История для данного UUID не найдена.");
+            return;
+        }
+
+        if (!map.containsKey(shortUrl)) {
+            System.out.println("Короткая ссылка не найдена в истории.");
+            return;
+        }
+
+        map.remove(shortUrl);
+        if (map.isEmpty()) {
+            history.remove(uuid);
+        }
+
+        System.out.println("Короткая ссылка успешно удалена.");
+    }
+
+    public void editMaxClicks(String uuid, String shortUrl, int newMaxClicks) {
+        Map<String, ShortUrl> map = history.get(uuid);
+        if (map == null) {
+            System.out.println("История для данного UUID не найдена.");
+            return;
+        }
+
+        ShortUrl shortUrlObj = map.get(shortUrl);
+        if (shortUrlObj == null) {
+            System.out.println("Короткая ссылка не найдена в истории.");
+            return;
+        }
+
+        shortUrlObj.setClickTLimit(newMaxClicks);
+        shortUrlObj.updateClicksAfterUpdateClickLimit();
+        System.out.println("Лимит переходов обновлен до " + newMaxClicks + ".");
+    }
+
     public void printHistory() {
         for (Map.Entry<String, Map<String, ShortUrl>> entry : history.entrySet()) {
             System.out.println("UUID: " + entry.getKey());
 
             for (Map.Entry<String, ShortUrl> urlEntry : entry.getValue().entrySet()) {
                 ShortUrl shortUrl = urlEntry.getValue();
-                System.out.printf("\tShort URL: %s\n\tLong URL: %s\n\tMax Clicks: %d\n\tDate Creation: %s\n",
+                System.out.printf("\tКороткая ссылка URL: %s\n\tДлинный URL: %s\n\tОставшееся кол-во переходов: %d\n\tДата создания ссылки: %s\n",
                         shortUrl.getShortUrl(),
                         shortUrl.getLongUrl(),
-                        shortUrl.getClickTLimit(),
+                        shortUrl.getLeftClicks(),
                         shortUrl.getDateCreation()
                 );
             }
+        }
+    }
+
+    public void printPersonalHistory(String uuid) {
+        Map<String, ShortUrl> map = history.get(uuid);
+        if (map == null) {
+            System.out.println("История для данного UUID не найдена.");
+            return;
+        }
+
+        System.out.println("История для UUID: " + uuid);
+        for (Map.Entry<String, ShortUrl> urlEntry : map.entrySet()) {
+            ShortUrl shortUrl = urlEntry.getValue();
+            System.out.printf("\tКороткая ссылка URL: %s\n\tДлинный URL: %s\n\tОставшееся кол-во переходов: %d\n\tДата создания ссылки: %s\n",
+                    shortUrl.getShortUrl(),
+                    shortUrl.getLongUrl(),
+                    shortUrl.getLeftClicks(),
+                    shortUrl.getDateCreation()
+            );
         }
     }
 }

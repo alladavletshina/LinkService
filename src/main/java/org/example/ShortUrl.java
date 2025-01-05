@@ -21,6 +21,10 @@ public class ShortUrl {
         return maxClicks;
     }
 
+    public void setClickTLimit(int newMaxClicks) {
+        this.maxClicks = newMaxClicks;
+    }
+
     public Date getDateCreation() {
         return dateCreation;
     }
@@ -35,7 +39,15 @@ public class ShortUrl {
 
     public void updateLeftClicks() {
         currentClicks += 1;
-        System.out.println("\nКоличество кликов обновлено. Осталось: " + (maxClicks - currentClicks));
+        System.out.println("\nКоличество кликов обновлено. Осталось: " + (getClickTLimit() - currentClicks));
+    }
+
+    public void updateClicksAfterUpdateClickLimit() {
+        currentClicks = 0;
+    }
+
+    public int getLeftClicks() {
+        return (getClickTLimit() - currentClicks);
     }
 
 }
