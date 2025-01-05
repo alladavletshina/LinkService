@@ -147,5 +147,5 @@ public class Main {
         System.out.println("Добро пожаловать в сервис сокращения ссылок!");
         UrlShortMaker urlShortMaker = new UrlShortMaker();
         main.greetingApplication(new UrlShortMaker());
-        }
+    }
 }
