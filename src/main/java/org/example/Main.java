@@ -1,5 +1,9 @@
 package org.example;
+import java.awt.*;
+import java.net.URI;
 import java.util.Scanner;
+import java.net.URISyntaxException;
+import java.io.IOException;
 
 public class Main {
 
@@ -10,36 +14,63 @@ public class Main {
         scanner = new Scanner(System.in);
     }
 
-    private void startApplication(String userId) {
+    private void startApplication(String userId, UrlShortMaker urlShortMaker) {
         while (true) {
             showMenu();
             int choice = getUserChoice();
-            UrlShortMaker urlShortMaker = new UrlShortMaker();
             String shortUrl;
             this.userId = userId;
 
             switch (choice) {
                 case 1:
                     System.out.println("Введите длинный URL для преобразования в короткую ссылку");
-                    String longUrl = "https://www.baeldung.com/java-9-http-clients";
-                    System.out.println(longUrl);
+                    String longUrl = scanner.nextLine();
 
                     System.out.println("Установите лимит на количество переходов по ссылке");
                     int maxClicks = getUserChoice();
 
                     shortUrl = urlShortMaker.genеrateShortUrl(userId,maxClicks, longUrl);
                     System.out.println("Короткая ссылка: " + shortUrl);
-                    urlShortMaker.printHistory();
                     break;
+
                 case 2:
-                    System.out.println("Введите короткую ссылку: ");
+                    System.out.print("Введите короткую ссылку: ");
                     shortUrl = scanner.nextLine();
-                    userId = scanner.nextLine();
-                    System.out.println(urlShortMaker.getLongUrl(userId, shortUrl));
-                    urlShortMaker.printHistory();
+                    ShortUrl makerLongUrl = urlShortMaker.getLongUrl(userId, shortUrl);
+
+                    if (makerLongUrl != null && makerLongUrl.getLeftClicks() > 0) {
+                        String url = makerLongUrl.getLongUrl();
+                        System.out.println("Исходный URL: " + url);
+                        try {
+                            Desktop.getDesktop().browse(new URI(url));
+                            makerLongUrl.updateLeftClicks();
+                        } catch (IOException | URISyntaxException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (makerLongUrl != null && makerLongUrl.getLeftClicks() <= 0) {
+                        System.out.println("К сожалению, количество доступных переходов по этой ссылке закончилось. Пожалуйста, создайте новую короткую ссылку.");
+                    } else {
+                        System.out.println("Короткая ссылка недействительна или истек срок ее действия.");
+                    }
+                    System.out.println();
                     break;
+
                 case 3:
-                    System.out.println("КОД-3");
+                    System.out.print("Введите короткую ссылку: ");
+                    shortUrl = scanner.nextLine();
+                    urlShortMaker.deleteShortUrl(userId, shortUrl);
+                    break;
+                case 4:
+                    urlShortMaker.printPersonalHistory(userId);
+                    break;
+                case 5:
+                    System.out.print("Введите короткую ссылку: ");
+                    shortUrl = scanner.nextLine();
+
+                    System.out.println("Обновите лимит на количество переходов по ссылке:");
+                    int newMaxClicks = getUserChoice();
+
+                    urlShortMaker.editMaxClicks(userId, shortUrl, newMaxClicks);
                     break;
                 case 0:
                     return;
@@ -60,6 +91,8 @@ public class Main {
         System.out.println("1. Создать новую короткую ссылку");
         System.out.println("2. Перейти по короткой ссылке");
         System.out.println("3. Удалить свою ссылку");
+        System.out.println("4. Посмотреть историю сохраненных ссылок");
+        System.out.println("5. Изменить короткую ссылку");
         System.out.println("0. Вернуться в главное меню");
         System.out.print("Ваш выбор: ");
     }
@@ -81,7 +114,7 @@ public class Main {
         System.out.print("Ваш выбор: ");
     }
 
-    private void greetingApplication() {
+    private void greetingApplication(UrlShortMaker urlShortMaker) {
         Main main = new Main();
         while (true) {
             greetingShowMenu();
@@ -92,13 +125,13 @@ public class Main {
                 case 1:
                     System.out.println("Введите уникальный идентификационный номер:");
                     userId = scanner.nextLine();
-                    startApplication(userId);
+                    startApplication(userId, urlShortMaker);
                     break;
                 case 2:
                     User user = new User();
                     userId = user.getUuid();
-                    System.out.println(userId);
-                    startApplication(userId);
+                    System.out.println("\nВам присвоен уникальный идентификационный номер: " + userId);
+                    startApplication(userId, urlShortMaker);
                     break;
                 case 0:
                     exitApp();
@@ -109,11 +142,10 @@ public class Main {
         }
     }
 
-
-
     public static void main(String[] args) {
         Main main = new Main();
         System.out.println("Добро пожаловать в сервис сокращения ссылок!");
-        main.greetingApplication();
-        }
+        UrlShortMaker urlShortMaker = new UrlShortMaker();
+        main.greetingApplication(new UrlShortMaker());
+    }
 }
